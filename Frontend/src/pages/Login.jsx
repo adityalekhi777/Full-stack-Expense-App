@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Navigate } from 'react-router-dom';
 import styles from './Login.module.css';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Login() {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     });
+    const { login, isAuthenticated } = useAuth();
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
@@ -35,10 +37,18 @@ export default function Login() {
                 throw new Error(data.message || `HTTP error! Status: ${res.status}`);
             }
 
-            setError({ type: "success", message: data.message });
+            // On successful login, update context and redirect
+            login(data.token);
+            navigate('/home');
+
         } catch (err) {
             setError({ type: "error", message: err.message });
         }
+    }
+
+    // If user is already authenticated, redirect to home
+    if (isAuthenticated) {
+        return <Navigate to="/home" />;
     }
 
     return (

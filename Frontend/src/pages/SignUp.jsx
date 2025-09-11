@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Navigate } from 'react-router-dom';
 import styles from './Login.module.css'; // Reusing styles from Login
+import { useAuth } from '../context/AuthContext.jsx';
 
 export default function SignUp() {
     const [formData, setFormData] = useState({
-        name: '',
+        username: '',
         email: '',
         password: '',
         confirmPassword: '',
     });
+    const { login, isAuthenticated } = useAuth();
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
@@ -30,6 +32,7 @@ export default function SignUp() {
 
         try {
             const { confirmPassword, ...dataToSend } = formData;
+
             const res = await fetch("http://localhost:3000/signup", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -42,10 +45,18 @@ export default function SignUp() {
                 throw new Error(data.message || `HTTP error! Status: ${res.status}`);
             }
 
-            setError({ type: "success", message: data.message });
+            // On successful signup, log the user in and redirect
+            login(data.token);
+            navigate('/home');
+
         } catch (err) {
             setError({ type: "error", message: err.message });
         }
+    }
+
+    // If user is already authenticated, redirect to home
+    if (isAuthenticated) {
+        return <Navigate to="/home" />;
     }
 
     return (
@@ -54,8 +65,8 @@ export default function SignUp() {
                 <h2>Sign Up</h2>
                 
                 <label className={styles.label}>
-                    Name:
-                    <input type='text' name='name' value={formData.name} onChange={changeHandler} className={styles.input} required />
+                    Username:
+                    <input type='text' name='username' value={formData.username} onChange={changeHandler} className={styles.input} required />
                 </label>
                 <label className={styles.label}>
                     Email:
