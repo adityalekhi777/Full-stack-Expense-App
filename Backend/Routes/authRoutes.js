@@ -7,9 +7,6 @@ const jwt = require('jsonwebtoken');
 // It's highly recommended to use an environment variable for the JWT secret
 const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_key_that_is_long';
 
-routes.get('/login', (req, res) => {
-  res.send('Hello from authRoutes');
-});
 
 routes.post('/signup', async (req, res, next) => {
   const { username, email, password } = req.body;
@@ -50,6 +47,7 @@ routes.post('/login', async (req, res, next) => {
     }
 
     const foundUser = await user.findOne({ email });
+
     if (!foundUser) {
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
