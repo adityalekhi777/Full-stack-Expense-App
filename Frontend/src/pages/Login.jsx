@@ -77,6 +77,9 @@ export default function Login() {
                     />
                 </label>
                 <button type='submit' className={styles.button}>Login</button>
+                <button type="button" onClick={() => navigate('/forgot-password')} className={styles.toggle_button}>
+                    Forgot Password?
+                </button>
                 <button type="button" onClick={() => navigate('/signup')} className={styles.toggle_button}>
                     New User, Sign Up
                 </button>
