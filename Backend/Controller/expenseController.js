@@ -18,8 +18,15 @@ exports.createExpense = async (req, res) => {
 
 exports.getExpenses = async (req, res) => {
     try {
-        const expenses = await Expense.find({ user: req.user.id });
-        res.json(expenses);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const expenses = await Expense.find({ user: req.user.id }).skip(skip).limit(limit);
+        const totalExpenses = await Expense.countDocuments({ user: req.user.id });
+        const totalPages = Math.ceil(totalExpenses / limit);
+
+        res.json({ expenses, totalPages });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

@@ -10,17 +10,20 @@ export default function Home() {
     const [amount, setAmount] = useState('');
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('Food');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
         const fetchExpenses = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/expenses', {
+                const response = await fetch(`http://localhost:3000/api/expenses?page=${currentPage}&limit=10`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
                 const data = await response.json();
-                setExpenses(data);
+                setExpenses(data.expenses);
+                setTotalPages(data.totalPages);
             } catch (error) {
                 console.error('Error fetching expenses:', error);
             }
@@ -29,7 +32,7 @@ export default function Home() {
         if (token) {
             fetchExpenses();
         }
-    }, [token]);
+    }, [token, currentPage]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -50,6 +53,14 @@ export default function Home() {
         } catch (error) {
             console.error('Error creating expense:', error);
         }
+    };
+
+    const handleNextPage = () => {
+        setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+    };
+
+    const handlePrevPage = () => {
+        setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
     };
 
     return (
@@ -81,6 +92,16 @@ export default function Home() {
             </form>
 
             <ExpenseList expenses={expenses} />
+
+            <div className={styles.pagination}>
+                <button onClick={handlePrevPage} disabled={currentPage === 1}>
+                    Previous
+                </button>
+                <span>{`Page ${currentPage} of ${totalPages}`}</span>
+                <button onClick={handleNextPage} disabled={currentPage === totalPages}>
+                    Next
+                </button>
+            </div>
         </div>
     );
 }
