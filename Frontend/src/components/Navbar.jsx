@@ -33,13 +33,18 @@ const logoutButtonStyle = {
 export default function Navbar() {
     const { isAuthenticated, logout } = useAuth();
 
-    if (!isAuthenticated) return null;
-
     return (
         <nav style={navbarStyle}>
-            <Link to="/home" style={linkStyle}><h2>ExpenseApp</h2></Link>
+            <Link to="/" style={linkStyle}><h2>ExpenseApp</h2></Link>
             <div style={navLinksStyle}>
-                <button onClick={logout} style={logoutButtonStyle}>Logout</button>
+                {isAuthenticated ? (
+                    <button onClick={logout} style={logoutButtonStyle}>Logout</button>
+                ) : (
+                    <>
+                        <Link to="/login" style={linkStyle}>Login</Link>
+                        <Link to="/signup" style={linkStyle}>Sign Up</Link>
+                    </>
+                )}
             </div>
         </nav>
     );
