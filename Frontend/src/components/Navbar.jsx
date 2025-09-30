@@ -37,6 +37,7 @@ export default function Navbar() {
         <nav style={navbarStyle}>
             <Link to="/" style={linkStyle}><h2>ExpenseApp</h2></Link>
             <div style={navLinksStyle}>
+                <Link to="/leaderboard" style={linkStyle}>Leaderboard</Link>
                 {isAuthenticated ? (
                     <button onClick={logout} style={logoutButtonStyle}>Logout</button>
                 ) : (

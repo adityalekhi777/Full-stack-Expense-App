@@ -1,4 +1,5 @@
 const Expense = require('../Models/expenseModel');
+const User = require('../Models/userModel');
 
 exports.createExpense = async (req, res) => {
     try {
@@ -10,6 +11,10 @@ exports.createExpense = async (req, res) => {
             category
         });
         await expense.save();
+
+        // Update total expenses for the user
+        await User.findByIdAndUpdate(req.user.id, { $inc: { totalExpenses: amount } });
+
         res.status(201).json(expense);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -27,6 +32,59 @@ exports.getExpenses = async (req, res) => {
         const totalPages = Math.ceil(totalExpenses / limit);
 
         res.json({ expenses, totalPages });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.deleteExpense = async (req, res) => {
+    try {
+        const expense = await Expense.findById(req.params.id);
+
+        if (!expense) {
+            return res.status(404).json({ message: 'Expense not found' });
+        }
+
+        if (expense.user.toString() !== req.user.id) {
+            return res.status(401).json({ message: 'Not authorized' });
+        }
+
+        // Update total expenses for the user
+        await User.findByIdAndUpdate(req.user.id, { $inc: { totalExpenses: -expense.amount } });
+
+        await expense.remove();
+
+        res.json({ message: 'Expense removed' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.updateExpense = async (req, res) => {
+    try {
+        const { amount, description, category } = req.body;
+        const expense = await Expense.findById(req.params.id);
+
+        if (!expense) {
+            return res.status(404).json({ message: 'Expense not found' });
+        }
+
+        if (expense.user.toString() !== req.user.id) {
+            return res.status(401).json({ message: 'Not authorized' });
+        }
+
+        const amountDifference = amount - expense.amount;
+
+        // Update total expenses for the user
+        await User.findByIdAndUpdate(req.user.id, { $inc: { totalExpenses: amountDifference } });
+
+        expense.amount = amount;
+        expense.description = description;
+        expense.category = category;
+
+        await expense.save();
+
+        res.json(expense);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
