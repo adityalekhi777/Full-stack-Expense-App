@@ -11,15 +11,17 @@ const leaderboardRoutes = require('./Routes/leaderboardRoutes')
 
 app.use(cors())
 app.use(express.json())
-app.use(express.static(path.join(__dirname, '../Frontend/dist')))
 
-app.use('/',authRoutes)
+
+app.use('/api/auth',authRoutes)
 app.use('/api/expenses', expenseRoutes)
 app.use('/api/leaderboard', leaderboardRoutes)
 
-app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../Frontend/dist', 'index.html'));
-})
+// app.get('*', (req, res) => {
+//     res.sendFile(path.resolve(__dirname, '../Frontend/dist', 'index.html'));
+// })
+
+// console.log(path.resolve(__dirname, '../Frontend/dist', 'index.html'));
 
 // Centralized error-handling middleware
 app.use((err, req, res, next) => {
@@ -39,7 +41,7 @@ mongoose.connect(process.env.MONGO_URI)
 .then(()=>{
 
     app.listen(process.env.PORT,()=>{
-        console.log("Server is running")
+        console.log("Data Base and Server are running")
     })
     
 })
