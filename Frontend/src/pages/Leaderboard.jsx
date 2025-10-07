@@ -9,7 +9,7 @@ const Leaderboard = () => {
         const fetchLeaderboard = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('http://localhost:3000/api/leaderboard', {
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/leaderboard`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }

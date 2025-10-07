@@ -16,7 +16,7 @@ export default function Home() {
     useEffect(() => {
         const fetchExpenses = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/expenses?page=${currentPage}&limit=10`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses?page=${currentPage}&limit=10`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -37,7 +37,7 @@ export default function Home() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:3000/api/expenses', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
